@@ -36,4 +36,93 @@ const addNoteHandler = (request, h) => {
     return response;
 };
 
-module.exports = { addNoteHandler};
+const getAllNotesHandler = () => ({
+    status:'success',
+    data: {
+        notes,
+    },
+});
+
+const getNoteByIdHandler = (request, h) =>{
+    const { id } = request.params;
+    const note = notes.filter((n) => n.id === id[0]);
+
+    if (note !== undefined){
+        return {
+            status:'success',
+            data: {
+                note,
+            },
+        };
+    }
+
+    const response = h.response({
+        status: 'fail',
+        message: 'Note not found',
+    });
+    response.code(404);
+    return response;
+};
+
+const editNoteByIdHandler = (request, h) => {
+    const { id } = request.params;
+    const { title, tags, body } = request.payload;
+    const updatedAt = new Date().toISOString();
+
+    const index = note.findIndex((note) => note.id === id);
+
+    if (index !== -1) { //if index is anithing but -1, it means it has successfully updated
+        notes[index] = {
+           ...notes[index],
+            title,
+            tags,
+            body,
+            updatedAt,
+        };
+
+        const response = h.response({
+            status:'success',
+            message: 'Note updated successfully',
+        });
+        response.code(200);
+        return response;
+    }
+
+    const response = h.response({
+        status: 'fail',
+        message: 'Note not found',
+    });
+    response.code(404);
+    return response;
+};
+
+const deleteNoteByIdHandler = (request, h) => {
+    const { id } = request.params;
+    const index = notes.findIndex((note) => note.id === id);
+
+    if (index!== -1) {
+        notes.splice(index, 1);
+        const response = h.response({
+            status:'success',
+            message: 'Note deleted successfully',
+        });
+        response.code(200);
+        return response;
+    }
+
+    const response = h.response({
+        status: 'fail',
+        message: 'Note not found',
+    });
+    response.code(404);
+    return response;
+
+};
+
+module.exports = { 
+    addNoteHandler, 
+    getAllNotesHandler, 
+    getNoteByIdHandler,
+    editNoteByIdHandler,
+    deleteNoteByIdHandler,
+};
